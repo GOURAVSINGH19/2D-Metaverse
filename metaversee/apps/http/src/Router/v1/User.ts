@@ -10,22 +10,26 @@ userRouter.post("/metadata", userMiddleware, async (req, res) => {
     res.status(400).json({ message: "Validation failed" });
     return;
   }
-
-  await client.user.update({
-    where: {
-      id: req.userId,
-    },
-    data: {
-      avatarId: parsedData.data.avatarId,
-    },
-  });
-  res.json({ message: "Metadata updated successfully" });
+  try {
+    await client.user.update({
+      where: {
+        id: req.userId,
+      },
+      data: {
+        avatarId: parsedData.data.avatarId,
+      },
+    });
+    res.json({ message: "Metadata updated" });
+  } catch (e) {
+    console.log("error");
+    res.status(400).json({ message: "Internal server error" });
+  }
 });
 
-userRouter.get("/user/metadata/bulk", async (req, res) => {
-  const userIdsString = (req.query.ids ?? "[]") as string;
-  const userIds = userIdsString.slice(1, userIdsString?.length - 2).split(","); // convert  array  into strings
-
+userRouter.get("/metadata/bulk", async (req, res) => {
+  const userIdString = (req.query.ids ?? "[]") as string;
+  const userIds = (userIdString).slice(1, userIdString?.length - 1).split(",");
+  console.log(userIds);
   const metadata = await client.user.findMany({
     where: {
       id: {
@@ -33,14 +37,14 @@ userRouter.get("/user/metadata/bulk", async (req, res) => {
       },
     },
     select: {
-      id: true,
       avatar: true,
+      id: true,
     },
   });
 
   res.json({
     avatars: metadata.map((m) => ({
-      userIds: m.id,
+      userId: m.id,
       avatarId: m.avatar?.imageUrl,
     })),
   });

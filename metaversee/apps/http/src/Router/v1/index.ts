@@ -16,6 +16,7 @@ router.post("/signup", async (req, res) => {
   const parsedData = SignupSchema.safeParse(req.body);
   if (!parsedData.success) {
     console.log("parsed data incorrect");
+    console.log(parsedData)
     res.status(400).json({ message: "Validation failed" });
     return;
   }
@@ -81,9 +82,29 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-router.get("/elements", async (req, res) => {});
+router.get("/elements", async (req, res) => {
+  const elements = await client.element.findMany({});
+  res.json({
+    elements: elements.map((e) => ({
+      id: e.id,
+      imageUrl: e.imageUrl,
+      x: e.width,
+      y: e.height,
+      static: e.static,
+    })),
+  });
+});
 
-router.get("/avatars", async (req, res) => {});
+router.get("/avatars", async (req, res) => {
+  const avatars = await client.avatar.findMany({});
+  res.json({
+    avatars: avatars.map((x) => ({
+      id: x.id,
+      name: x.name,
+      imageUrl: x.imageUrl,
+    })),
+  });
+});
 
 router.use("/user", userRouter);
 router.use("/space", spaceRouter);
