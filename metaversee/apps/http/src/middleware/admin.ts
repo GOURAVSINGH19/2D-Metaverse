@@ -7,7 +7,6 @@ export const AdminMiddleware = (req: Request, res: Response, next: NextFunction)
     const header = req.headers["authorization"];
     const token = header?.split(" ")[1];
 
-    console.log(token)
     
     if (!token) {
         res.status(403).json({message: "Unauthorized"})

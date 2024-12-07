@@ -85,8 +85,6 @@ adminRouter.post("/map", async (req, res) => {
     },
   });
 
-  console.log("mapcreate ------------------------sfs" , map);
-
   res.json({
     id: map.id,
   });
